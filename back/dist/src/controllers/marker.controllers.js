@@ -40,15 +40,6 @@ const createMarker = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.createMarker = createMarker;
-// const getAllMarkers = async (req: Request, res: Response) => {
-// 	try {
-// 		const allMarkers = await Marker.findAll();
-// 		res.status(200).json({ markers: allMarkers });
-// 	} catch (error) {
-// 		console.error('Error fetching markers:', error);
-// 		res.status(500).json({ error: 'Unable to fetch markers' });
-// 	}
-// };
 const getAllMarkers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const responseToken = req.headers.authorization;
@@ -110,27 +101,6 @@ const updateMarker = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.updateMarker = updateMarker;
-// const deleteMarker = async (req: Request, res: Response) => {
-// 	try {
-// 		const { selectedMarkerId } = req.params;
-// 		const responseToken = req.headers.authorization;
-// 		if (!responseToken) {
-// 			return res.status(401).json({ error: 'Missing Authorization header' });
-// 		}
-// 		const token = responseToken.replace('Bearer ', '');
-// 		const decodedToken = jwt.verify(token, SECRET) as JwtPayload;
-// 		const user_id = decodedToken.id;
-// 		const existingMarker = await Marker.findOne({ where: { id, user_id } });
-// 		if (!existingMarker) {
-// 			return res.status(403).json({ message: 'You do not have permission to delete this marker' });
-// 		}
-// 		await Marker.destroy({ where: { id, user_id } });
-// 		return res.status(200).json({ message: 'Marker deleted' });
-// 	} catch (error) {
-// 		console.error('Error deleting marker:', error);
-// 		res.status(500).json({ message: 'Internal Server Error' });
-// 	}
-// };
 const deleteMarker = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { selectedMarkerId } = req.params;

@@ -24,10 +24,10 @@ app.get('/', (req: Request, res: Response) => {
 	return res.status(200).send('Vagabond Server');
 });
 
-const options = {
-	key: fs.readFileSync('server.key'),
-	cert: fs.readFileSync('server.cert'),
-};
+// const options = {
+// 	key: fs.readFileSync('server.key'),
+// 	cert: fs.readFileSync('server.cert'),
+// };
 
 app.use('/user', userRoutes);
 app.use('/post', postRoutes);

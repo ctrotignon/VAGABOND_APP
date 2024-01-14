@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs_1 = __importDefault(require("fs"));
 const express_1 = __importDefault(require("express"));
 const databaseConfig_1 = require("./config/databaseConfig");
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -22,10 +21,10 @@ app.use(express_1.default.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
     return res.status(200).send('Vagabond Server');
 });
-const options = {
-    key: fs_1.default.readFileSync('server.key'),
-    cert: fs_1.default.readFileSync('server.cert'),
-};
+// const options = {
+// 	key: fs.readFileSync('server.key'),
+// 	cert: fs.readFileSync('server.cert'),
+// };
 app.use('/user', user_routes_1.userRoutes);
 app.use('/post', post_routes_1.postRoutes);
 app.use('/marker', marker_routes_1.markerRoutes);

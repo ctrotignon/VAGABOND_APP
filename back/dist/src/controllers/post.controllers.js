@@ -24,7 +24,6 @@ const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const { type, mediaURL } = req.body;
         const responseToken = req.headers.authorization;
-        console.log('MEDIA URL SEQ', mediaURL);
         if (!responseToken) {
             throw new Error('token not found');
         }

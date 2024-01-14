@@ -65,7 +65,6 @@ const getByUsername = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             where: { username: username },
         });
         if (user) {
-            console.log('USER FOUND BACK');
             res.json(user.id);
         }
         else {
@@ -84,7 +83,6 @@ const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             where: { id: parseInt(userId, 10) },
         });
         if (user) {
-            console.log('USER FOUND BACK');
             res.status(200).json(user.username);
         }
         else {
@@ -105,7 +103,6 @@ const getUserConnected = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const token = responseToken.replace('Bearer ', '');
         const decodedToken = jsonwebtoken_1.default.verify(token, SECRET);
         const user_id = decodedToken.id;
-        // Vérifier l'existence de l'utilisateur
         const user = yield user_model_1.User.findOne({ where: { id: user_id } });
         if (!user) {
             throw new Error('User not found');
@@ -127,17 +124,14 @@ const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         const token = responseToken.replace('Bearer ', '');
         const decodedToken = jsonwebtoken_1.default.verify(token, SECRET);
         const user_id = decodedToken.id;
-        // Vérifier l'existence de l'utilisateur
         const user = yield user_model_1.User.findOne({ where: { id: user_id } });
         if (!user) {
             throw new Error('User not found');
         }
-        // Vérifier si le mot de passe actuel est correct
         const validPassword = yield bcrypt_1.default.compare(currentPassword, user.password);
         if (!validPassword) {
             throw new Error('Invalid current password');
         }
-        // Hasher et sauvegarder le nouveau mot de passe
         const hashedNewPassword = yield bcrypt_1.default.hash(newPassword, 10);
         user.password = hashedNewPassword;
         yield user.save();

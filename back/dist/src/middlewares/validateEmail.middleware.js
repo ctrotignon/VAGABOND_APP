@@ -8,7 +8,7 @@ const isValidEmailFormat = (email) => {
 const validateEmailMiddleware = (req, res, next) => {
     const { email } = req.body;
     if (email && !isValidEmailFormat(email)) {
-        return res.status(400).json({ message: "Invalid email format" });
+        return res.status(400).json({ message: 'Invalid email format' });
     }
     next();
 };
