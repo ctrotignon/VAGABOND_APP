@@ -1,0 +1,33 @@
+{
+	"expo": {
+		"scheme": "https",
+		"ssl": {
+			"cert": "../back/server.cert",
+			"key": "../back/server.key"
+		},
+		"name": "my-app",
+		"slug": "my-app",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"userInterfaceStyle": "light",
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"supportsTablet": true
+		},
+		"android": {
+			"adaptiveIcon": {
+				"backgroundColor": "#ffffff"
+			}
+		},
+		"web": {
+			"favicon": "./assets/favicon.png"
+		},
+		"fonts": [
+			{
+				"asset": "./assets/fonts/Montserrat-Regular.ttf"
+			},
+			{ "asset": "./assets/fonts/Montserrat-Bold.ttf" },
+			{ "asset": "./assets/fonts/JustAnotherHand-Regular.ttf" }
+		]
+	}
+}
