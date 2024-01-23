@@ -15,7 +15,7 @@ const comment_routes_1 = require("./routes/comment.routes");
 const like_routes_1 = require("./routes/like.routes");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-const PORT = 443;
+const PORT = 3000;
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.get('/', (req, res) => {

@@ -29,7 +29,6 @@ exports.sequelizeConnection = new sequelize_1.Sequelize(DB_NAME, DB_USERNAME, DB
 });
 const checkDbConnection = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log('test connections');
         yield exports.sequelizeConnection.authenticate();
         console.log('Connection has been established successfully !');
     }
