@@ -1,5 +1,3 @@
-import https from 'https';
-import fs from 'fs';
 import express, { Express, Request, Response } from 'express';
 import { checkDbConnection, synchronizeDb } from './config/databaseConfig';
 import dotenv from 'dotenv';
@@ -23,11 +21,6 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (req: Request, res: Response) => {
 	return res.status(200).send('Vagabond Server');
 });
-
-const options = {
-	key: fs.readFileSync('server.key'),
-	cert: fs.readFileSync('server.cert'),
-};
 
 app.use('/user', userRoutes);
 app.use('/post', postRoutes);
