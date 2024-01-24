@@ -31,10 +31,10 @@ const checkDbConnection = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log('test connections');
         yield exports.sequelizeConnection.authenticate();
-        console.log('Connection has been established successfully 🚀🚀');
+        console.log('Connection has been established successfully !');
     }
     catch (error) {
-        throw new Error(`Unable to connect to the database: 😭😭😭😭: ${error}`);
+        throw new Error(`Unable to connect to the database: ${error}`);
     }
 });
 exports.checkDbConnection = checkDbConnection;
@@ -42,7 +42,7 @@ const synchronizeDb = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield exports.sequelizeConnection.sync();
         // await sequelizeConfig.sync({alter : true});
-        console.log('All models were synchronized successfully.🧡🧡🧡');
+        console.log('All models were synchronized successfully');
     }
     catch (error) {
         throw new Error(`Unable to synchronize the database : ${error}`);
