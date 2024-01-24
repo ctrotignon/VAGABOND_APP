@@ -5,17 +5,14 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "feature/**" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "feature/**" ]
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
-    defaults: 
-      run:
-        working-directory: ./back
     strategy:
       matrix:
         node-version: [14.x, 16.x, 18.x]
