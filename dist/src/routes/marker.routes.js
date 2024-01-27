@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.markerRoutes = void 0;
+const express_1 = require("express");
+const marker_controllers_1 = require("../controllers/marker.controllers");
+const authenticate_middleware_1 = require("../middlewares/authenticate.middleware");
+const markerRoutes = (0, express_1.Router)();
+exports.markerRoutes = markerRoutes;
+markerRoutes.post('/createMarker', authenticate_middleware_1.authenticate, marker_controllers_1.createMarker);
+markerRoutes.get('/getAllMarkers', authenticate_middleware_1.authenticate, marker_controllers_1.getAllMarkers);
+markerRoutes.get('/getMarkersByUser', authenticate_middleware_1.authenticate, marker_controllers_1.getMarkersByUser);
+markerRoutes.put('/updateMarker', authenticate_middleware_1.authenticate, marker_controllers_1.updateMarker);
+markerRoutes.delete('/deleteMarker/:selectedMarkerId', authenticate_middleware_1.authenticate, marker_controllers_1.deleteMarker);
