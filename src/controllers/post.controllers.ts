@@ -18,8 +18,8 @@ const createPost = async (req: Request, res: Response) => {
 		const token = responseToken.replace('Bearer ', '');
 
 		const decodedToken = jwt.verify(token, SECRET) as JwtPayload;
-		const user_id = decodedToken.id;
-		const post = await Post.create({ user_id, type, mediaURL });
+		const userId = decodedToken.id;
+		const post = await Post.create({ userId, type, mediaURL });
 		return res.status(201).json({ message: 'Post created', post: post });
 	} catch (error) {
 		console.error('Error creating user:', error);
@@ -32,12 +32,15 @@ const getAllPosts = async (req: Request, res: Response) => {
 		console.debug('Entering getAllPosts endpoint');
 		const allPosts = await Post.findAll();
 
-		const postList = allPosts.map((post) => ({
-			user_id: post.getDataValue('user_id'),
-			id: post.getDataValue('id'),
-			type: post.getDataValue('type'),
-			mediaURL: post.getDataValue('mediaURL'),
-		}));
+		const postList = allPosts.map((post) => {
+			return {
+				userId: post.getDataValue('userId'),
+				id: post.getDataValue('id'),
+				type: post.getDataValue('type'),
+				mediaURL: post.getDataValue('mediaURL'),
+				createdAt: post.getDataValue('createdAt'),
+			};
+		});
 
 		res.status(200).json({ posts: postList });
 	} catch (error) {
@@ -57,12 +60,32 @@ const getAllMedias = async (req: Request, res: Response) => {
 	}
 };
 
+const getPostCountByUser = async (req: Request, res: Response) => {
+	const { postUserId } = req.params;
+
+	if (postUserId === undefined || postUserId === null) {
+		return res.status(400).json({ error: 'Invalid user ID' });
+	}
+	try {
+		const postCount = await Post.count({
+			where: {
+				userId: postUserId,
+			},
+		});
+		res.status(201).json(postCount);
+		console.log('POST COU?T ', postCount);
+	} catch (error) {
+		console.error('Error fetching followers count:', error);
+		res.status(500).json({ error: 'Internal Server Error' });
+	}
+};
+
 const getPostsSpecificUser = async (req: Request, res: Response) => {
 	try {
 		const { postUserId } = req.params;
 		const allPosts = await Post.findAll({
 			where: {
-				user_id: postUserId,
+				userId: postUserId,
 			},
 		});
 		if (!allPosts) {
@@ -79,4 +102,4 @@ const getPostsSpecificUser = async (req: Request, res: Response) => {
 const updatePost = async (req: Request, res: Response) => {};
 const deletePost = async (req: Request, res: Response) => {};
 
-export { createPost, getAllPosts, getPostsSpecificUser, getAllMedias, updatePost, deletePost };
+export { createPost, getAllPosts, getPostsSpecificUser, getAllMedias, getPostCountByUser, updatePost, deletePost };

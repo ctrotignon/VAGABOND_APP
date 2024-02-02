@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 //IMPORT USER'S CONTROLLERS
-import { register, login, getByUsername, deleteUser, updatePassword, getUserConnected, getUserById } from '../controllers/user.controllers';
+import { register, login, getByUsername, deleteUser, updatePassword, getUserConnected, getUserById, verifyEmail } from '../controllers/user.controllers';
 
 // IMPORT USER'S MIDDLEWARES
 
@@ -20,8 +20,9 @@ userRoutes.post('/register', checkUniqueUserMiddleware, validateEmailMiddleware,
 userRoutes.post('/login', login);
 userRoutes.get('/:username', getByUsername);
 userRoutes.get('/getUserById/:userId', getUserById);
-userRoutes.post('/getUserConnected', getUserConnected);
-userRoutes.put('/updatePAssword', updatePassword);
-userRoutes.delete('/deleteUser', deleteUser);
+userRoutes.post('/getUserConnected', authenticate, getUserConnected);
+userRoutes.put('/updatePAssword', authenticate, updatePassword);
+userRoutes.delete('/deleteUser', authenticate, deleteUser);
+userRoutes.post('/verify', authenticate, verifyEmail);
 
 export { userRoutes };

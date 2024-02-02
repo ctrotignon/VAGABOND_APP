@@ -10,11 +10,11 @@ exports.Comment = void 0;
 // 			type: DataTypes.TEXT,
 // 			allowNull: false,
 // 		},
-// 		post_id: {
+// 		postId: {
 // 			type: DataTypes.INTEGER,
 // 			allowNull: false,
 // 		},
-// 		user_id: {
+// 		userId: {
 // 			type: DataTypes.INTEGER,
 // 			allowNull: false,
 // 		},
@@ -30,11 +30,11 @@ const Comment = databaseConfig_1.sequelizeConnection.define('Comment', {
         type: sequelize_1.DataTypes.TEXT,
         allowNull: false,
     },
-    post_id: {
+    postId: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
     },
-    user_id: {
+    userId: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
     },

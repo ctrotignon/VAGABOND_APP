@@ -8,11 +8,11 @@
 // 			type: DataTypes.TEXT,
 // 			allowNull: false,
 // 		},
-// 		post_id: {
+// 		postId: {
 // 			type: DataTypes.INTEGER,
 // 			allowNull: false,
 // 		},
-// 		user_id: {
+// 		userId: {
 // 			type: DataTypes.INTEGER,
 // 			allowNull: false,
 // 		},
@@ -28,8 +28,8 @@ import { sequelizeConnection } from '../config/databaseConfig';
 type CommentAttributes = {
 	id?: number;
 	content: string;
-	post_id: number;
-	user_id: number;
+	postId: number;
+	userId: number;
 };
 
 type CommentCreationAttributes = Optional<CommentAttributes, 'id'>;
@@ -42,11 +42,11 @@ const Comment = sequelizeConnection.define<CommentInstance>(
 			type: DataTypes.TEXT,
 			allowNull: false,
 		},
-		post_id: {
+		postId: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 		},
-		user_id: {
+		userId: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 		},

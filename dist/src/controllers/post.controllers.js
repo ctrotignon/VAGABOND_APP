@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deletePost = exports.updatePost = exports.getAllMedias = exports.getPostsSpecificUser = exports.getAllPosts = exports.createPost = void 0;
+exports.deletePost = exports.updatePost = exports.getPostCountByUser = exports.getAllMedias = exports.getPostsSpecificUser = exports.getAllPosts = exports.createPost = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 require("dotenv/config");
 const { SECRET } = process.env;
@@ -29,8 +29,8 @@ const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         }
         const token = responseToken.replace('Bearer ', '');
         const decodedToken = jsonwebtoken_1.default.verify(token, SECRET);
-        const user_id = decodedToken.id;
-        const post = yield post_model_1.Post.create({ user_id, type, mediaURL });
+        const userId = decodedToken.id;
+        const post = yield post_model_1.Post.create({ userId, type, mediaURL });
         return res.status(201).json({ message: 'Post created', post: post });
     }
     catch (error) {
@@ -43,12 +43,15 @@ const getAllPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     try {
         console.debug('Entering getAllPosts endpoint');
         const allPosts = yield post_model_1.Post.findAll();
-        const postList = allPosts.map((post) => ({
-            user_id: post.getDataValue('user_id'),
-            id: post.getDataValue('id'),
-            type: post.getDataValue('type'),
-            mediaURL: post.getDataValue('mediaURL'),
-        }));
+        const postList = allPosts.map((post) => {
+            return {
+                userId: post.getDataValue('userId'),
+                id: post.getDataValue('id'),
+                type: post.getDataValue('type'),
+                mediaURL: post.getDataValue('mediaURL'),
+                createdAt: post.getDataValue('createdAt'),
+            };
+        });
         res.status(200).json({ posts: postList });
     }
     catch (error) {
@@ -69,12 +72,32 @@ const getAllMedias = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getAllMedias = getAllMedias;
+const getPostCountByUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { postUserId } = req.params;
+    if (postUserId === undefined || postUserId === null) {
+        return res.status(400).json({ error: 'Invalid user ID' });
+    }
+    try {
+        const postCount = yield post_model_1.Post.count({
+            where: {
+                userId: postUserId,
+            },
+        });
+        res.status(201).json(postCount);
+        console.log('POST COU?T ', postCount);
+    }
+    catch (error) {
+        console.error('Error fetching followers count:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+exports.getPostCountByUser = getPostCountByUser;
 const getPostsSpecificUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { postUserId } = req.params;
         const allPosts = yield post_model_1.Post.findAll({
             where: {
-                user_id: postUserId,
+                userId: postUserId,
             },
         });
         if (!allPosts) {

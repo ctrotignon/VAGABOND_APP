@@ -36,7 +36,7 @@ const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        req.body.user_id = userId;
+        req.body.userId = userId;
         next();
     }
     catch (error) {

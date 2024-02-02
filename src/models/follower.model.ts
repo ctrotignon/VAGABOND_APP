@@ -3,8 +3,8 @@ import { sequelizeConnection } from '../config/databaseConfig';
 
 type FollowerAttributes = {
 	id?: number;
-	follower_user_id: number;
-	following_user_id: number;
+	followerUserId: number;
+	followingUserId: number;
 };
 
 type FollowerCreationAttributes = Optional<FollowerAttributes, 'id'>;
@@ -14,11 +14,11 @@ type FollowerInstance = Model<FollowerAttributes, FollowerCreationAttributes> & 
 const Follower = sequelizeConnection.define<FollowerInstance>(
 	'Follower',
 	{
-		follower_user_id: {
+		followerUserId: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 		},
-		following_user_id: {
+		followingUserId: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 		},

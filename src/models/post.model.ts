@@ -3,7 +3,7 @@ import { sequelizeConnection } from '../config/databaseConfig';
 
 interface PostAttributes {
 	id?: number;
-	user_id: number;
+	userId: number;
 	type: string;
 	mediaURL: string;
 }
@@ -11,7 +11,7 @@ interface PostInstance extends Model<PostAttributes>, PostAttributes {}
 const Post = sequelizeConnection.define(
 	'Post',
 	{
-		user_id: {
+		userId: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
 		},

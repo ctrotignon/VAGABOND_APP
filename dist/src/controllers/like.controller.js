@@ -14,7 +14,7 @@ const like_model_1 = require("../models/like.model");
 const LikePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { postId, userId } = req.params;
-        yield like_model_1.Like.create({ post_id: postId, user_id: userId });
+        yield like_model_1.Like.create({ postId: postId, userId: userId });
         res.status(201).json({ message: 'Like successfully created ' });
     }
     catch (error) {
@@ -26,7 +26,7 @@ exports.LikePost = LikePost;
 const getLikeByPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { postId } = req.params;
-        const likeCount = yield like_model_1.Like.count({ where: { post_id: postId } });
+        const likeCount = yield like_model_1.Like.count({ where: { postId: postId } });
         res.status(200).json({ likeCount });
     }
     catch (error) {
@@ -40,8 +40,8 @@ const userAlreadyLikedPost = (req, res) => __awaiter(void 0, void 0, void 0, fun
         const { postId, userId } = req.params;
         const existingLike = yield like_model_1.Like.findOne({
             where: {
-                post_id: postId,
-                user_id: userId,
+                postId: postId,
+                userId: userId,
             },
         });
         const likeExists = !!existingLike;
@@ -56,7 +56,7 @@ exports.userAlreadyLikedPost = userAlreadyLikedPost;
 const deleteLikeByPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { postId, userId } = req.params;
-        const likeCount = yield like_model_1.Like.destroy({ where: { user_id: userId, post_id: postId } });
+        const likeCount = yield like_model_1.Like.destroy({ where: { userId: userId, postId: postId } });
         res.status(200).json({ likeCount });
     }
     catch (error) {

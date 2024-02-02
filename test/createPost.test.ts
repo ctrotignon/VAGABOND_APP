@@ -23,13 +23,13 @@ describe('createPost', () => {
 	it('should create a post and return a success response', async () => {
 		const mockDecodedToken: JwtPayload = { id: 'mockUserId' };
 		jest.mocked(jwt.verify).mockReturnValueOnce(mockDecodedToken as any);
-		const mockPost = { id: 'mockPostId', user_id: 'mockUserId', type: 'text', mediaURL: 'example.jpg' };
+		const mockPost = { id: 'mockPostId', userId: 'mockUserId', type: 'text', mediaURL: 'example.jpg' };
 		Post.create = jest.fn().mockResolvedValueOnce(mockPost);
 
 		await createPost(mockRequest, mockResponse);
 
 		expect(jwt.verify).toHaveBeenCalledWith('mockToken', expect.any(String));
-		expect(Post.create).toHaveBeenCalledWith({ user_id: 'mockUserId', type: 'text', mediaURL: 'example.jpg' });
+		expect(Post.create).toHaveBeenCalledWith({ userId: 'mockUserId', type: 'text', mediaURL: 'example.jpg' });
 		expect(mockResponse.status).toHaveBeenCalledWith(201);
 		expect(mockResponse.json).toHaveBeenCalledWith({ message: 'Post created', post: mockPost });
 	});

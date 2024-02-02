@@ -4,8 +4,8 @@ import { Follower } from '../models/follower.model';
 
 const followUser = async (req: Request, res: Response) => {
 	try {
-		const { follower_user_id, following_user_id } = req.body;
-		await Follower.create({ follower_user_id, following_user_id });
+		const { followerUserId, followingUserId } = req.body;
+		await Follower.create({ followerUserId, followingUserId });
 		res.status(201).json({ message: 'Successfully followed the user' });
 	} catch (error) {
 		console.error(error);
@@ -15,9 +15,9 @@ const followUser = async (req: Request, res: Response) => {
 
 const unfollowUser = async (req: Request, res: Response) => {
 	try {
-		const { follower_user_id, following_user_id } = req.body;
+		const { followerUserId, followingUserId } = req.body;
 		await Follower.destroy({
-			where: { follower_user_id, following_user_id },
+			where: { followerUserId, followingUserId },
 		});
 		res.json({ message: 'Successfully unfollowed the user' });
 	} catch (error) {
@@ -31,7 +31,7 @@ const getFollowersCount = async (req: Request, res: Response) => {
 	try {
 		const followersCount = await Follower.count({
 			where: {
-				following_user_id: userId,
+				followingUserId: userId,
 			},
 		});
 		res.json(followersCount);
@@ -46,7 +46,7 @@ const getFollowingCount = async (req: Request, res: Response) => {
 	try {
 		const followingCount = await Follower.count({
 			where: {
-				follower_user_id: userId,
+				followerUserId: userId,
 			},
 		});
 		res.json(followingCount);
@@ -56,4 +56,23 @@ const getFollowingCount = async (req: Request, res: Response) => {
 	}
 };
 
-export { followUser, unfollowUser, getFollowersCount, getFollowingCount };
+const userAlreadyFollowedUser = async (req: Request, res: Response) => {
+	try {
+		const { followerId, followingId } = req.params;
+		const existingFollow = await Follower.findOne({
+			where: {
+				followerUserId: followerId,
+				followingUserId: followingId,
+			},
+		});
+		const followExists = !!existingFollow;
+		console.log('FOLLLLLLLOOOOWWWWW', followExists);
+
+		res.status(200).json({ followExists });
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: 'Internal Server Error' });
+	}
+};
+
+export { followUser, unfollowUser, getFollowersCount, getFollowingCount, userAlreadyFollowedUser };

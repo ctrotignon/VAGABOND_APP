@@ -11,18 +11,9 @@ if (!SECRET) {
 
 const addComment = async (req: Request, res: Response) => {
 	try {
-		const { content, postId } = req.body;
-		const responseToken = req.headers.authorization;
+		const { userId, content, postId } = req.body;
 
-		if (!responseToken) {
-			return res.status(401).json({ error: 'Missing Authorization header' });
-		}
-		const token = responseToken.replace('Bearer ', '');
-
-		const decodedToken = jwt.verify(token, SECRET) as JwtPayload;
-		const user_id = decodedToken.id;
-
-		await Comment.create({ content, user_id, post_id: postId });
+		await Comment.create({ content, userId, postId: postId });
 
 		return res.status(201).json({ message: 'Comment created' });
 	} catch (error) {
@@ -46,7 +37,7 @@ const getCommentsOfSpecificPost = async (req: Request, res: Response) => {
 		}
 
 		// Récupérer tous les commentaires du post
-		const comments = await Comment.findAll({ where: { post_id: postId } });
+		const comments = await Comment.findAll({ where: { postId: postId } });
 
 		res.status(200).json(comments);
 	} catch (error) {

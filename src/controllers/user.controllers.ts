@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
@@ -18,54 +19,59 @@ import { User } from '../models/user.model';
 import { generateToken } from '../../utils/generateToken';
 import { handleErrorResponse } from '../../utils/handleErrorResponse';
 
-// const register = async (req: Request, res: Response): Promise<void> => {
-// 	try {
-// 		const { email, username, password } = req.body;
-// 		const user = await User.create({ email, username, password });
-// 		const { id } = user;
-// 		const token = generateToken(id ?? 0);
-
-// 		const response = { message: 'User created', token };
-// 		res.status(201).json(response);
-// 	} catch (error) {
-// 		handleErrorResponse(res, error);
-// 	}
-// };
+const temporaryVerificationCodes: { [email: string]: string } = {};
 
 const register = async (req: Request, res: Response): Promise<void> => {
 	try {
 		const { email, username, password } = req.body;
+
+		const existingUser = await User.findOne({
+			where: {
+				[Op.or]: [{ email }, { username }],
+			},
+		});
+		if (existingUser) {
+			res.status(422).json({ message: 'Email or username already exists' });
+		}
+
 		const user = await User.create({ email, username, password, isVerified: false });
-		console.log('USER CREART4ED WESH');
-		// console.log('USER CREART4ED WESH');
 
 		const { id } = user;
 		const token = generateToken(id ?? 0);
-		console.log('USER TOKEN WESH');
 
-		// Envoi de l'e-mail de vérification
 		// const verificationLink = `http://localhost:3000/user/verify`;
+		console.log('mail', email);
+		const code = crypto.randomUUID().substring(0, 6);
+		temporaryVerificationCodes[email] = code;
 
-		// const mailOptions = {
-		// 	from: 'noreply@vagabond.com',
-		// 	to: email,
-		// 	subject: "Vérification de l'e-mail",
-		// 	text: `Clique sur le lien suivant pour vérifier ton e-mail : ${verificationLink}`,
-		// };
-		// const transporter = nodemailer.createTransport({
-		// 	host: SMTP_HOST,
-		// 	port: Number(SMTP_PORT),
-		// 	secure: false,
-		// 	auth: {
-		// 		user: SMTP_USER,
-		// 		pass: SMTP_PASS,
-		// 	},
-		// });
+		const mailOptions = {
+			from: 'noreply@vagabond.com',
+			to: email,
+			subject: "Vérification de l'e-mail",
 
+			html: `
+
+			<h2> Plus qu'une étape pour rejoindre la communauté Vagabond </h2>
+			<p>Copie le code suivant pour vérifier ton e-mail: ${code}</p>
+			`,
+		};
+		const transporter = nodemailer.createTransport({
+			host: 'smtp-relay.brevo.com',
+			port: 587,
+			secure: false,
+			auth: {
+				user: 'trotignon.clement@gmail.com',
+				pass: 'zV9LTNK7sQYIWAxn',
+			},
+		});
+		const info = await transporter.sendMail(mailOptions);
+
+		console.log('E-mail de vérification envoyé:', info.response);
 		// transporter.sendMail(mailOptions, (error, info) => {
 		// 	if (error) {
 		// 		console.error('Error sending verification email:', error);
 		// 		const response = { message: 'Error sending verification email', error: error.message };
+		// 		console.log('Nodemailer info object:', info);
 		// 		res.status(422).json(response);
 		// 	} else {
 		// 		console.log('Verification email sent:', info.response);
@@ -79,40 +85,31 @@ const register = async (req: Request, res: Response): Promise<void> => {
 		handleErrorResponse(res, error);
 	}
 };
-
 const verifyEmail = async (req: Request, res: Response) => {
 	try {
-		const { token } = req.params;
-		const decodedToken = jwt.verify(token as string, SECRET) as JwtPayload;
-		const userId = decodedToken.id;
-		await User.update({ isVerified: true }, { where: { id: userId } });
+		console.log('TEMPO', temporaryVerificationCodes);
+		const { userId, code } = req.body;
+		const user = await User.findOne({ where: { id: userId } });
 
-		const response = { message: 'E-mail verified successfully.', isVerified: true };
-		res.status(200).json(response);
+		if (!user) {
+			return res.status(404).json({ success: false, message: 'User not found' });
+		}
+
+		const email = user.email;
+
+		if (temporaryVerificationCodes[email] === code) {
+			await User.update({ isVerified: true }, { where: { id: userId } });
+			// delete temporaryVerificationCodes[email];
+
+			const response = { success: true, message: 'E-mail verified successfully.', isVerified: true };
+			return res.status(200).json(response);
+		} else {
+			return res.status(400).json({ success: false, message: 'Invalid verification code', isVerified: false });
+		}
 	} catch (error) {
 		handleErrorResponse(res, error);
 	}
 };
-
-// const verifyEmail = async (req: Request, res: Response) => {
-// 	try {
-// 		const { username } = req.params;
-// 		const user = await User.findOne({ where: { username } });
-
-// 		if (user) {
-// 			const { id } = user;
-// 			await User.update({ isVerified: true }, { where: { id } });
-// 			const response = { message: 'E-mail verified successfully.', isVerified: true };
-// 			res.status(200).json(response);
-// 		} else {
-// 			const response = { message: 'User not found.', isVerified: false };
-// 			res.status(404).json(response);
-// 		}
-// 	} catch (error) {
-// 		handleErrorResponse(res, error);
-// 	}
-// };
-
 const login = async (req: Request, res: Response): Promise<void> => {
 	try {
 		console.log('trying to login');
@@ -120,13 +117,16 @@ const login = async (req: Request, res: Response): Promise<void> => {
 		const user = await User.findOne({ where: { username } });
 
 		if (!user) {
-			throw new Error('Invalid username');
+			res.status(401).json({ message: 'Invalid password' });
+			return;
+			// throw new Error('Invalid username');
 		}
 
 		const validPassword = await bcrypt.compare(password, user.password);
 
 		if (!validPassword) {
-			throw new Error('Invalid username or password');
+			res.status(401).json({ message: 'Invalid password' });
+			return;
 		}
 		const { id, isVerified } = user;
 		const token = generateToken(id ?? 0);
@@ -175,17 +175,9 @@ const getUserById = async (req: Request, res: Response) => {
 
 const getUserConnected = async (req: Request, res: Response): Promise<void> => {
 	try {
-		const responseToken = req.headers.authorization;
+		const { userId } = req.body;
 
-		if (!responseToken) {
-			throw new Error('token not found');
-		}
-		const token = responseToken.replace('Bearer ', '');
-
-		const decodedToken = jwt.verify(token, SECRET) as JwtPayload;
-		const user_id = decodedToken.id;
-
-		const user = await User.findOne({ where: { id: user_id } });
+		const user = await User.findOne({ where: { id: userId } });
 		if (!user) {
 			throw new Error('User not found');
 		}
@@ -197,18 +189,9 @@ const getUserConnected = async (req: Request, res: Response): Promise<void> => {
 
 const updatePassword = async (req: Request, res: Response) => {
 	try {
-		const { currentPassword, newPassword } = req.body;
-		const responseToken = req.headers.authorization;
+		const { userId, currentPassword, newPassword } = req.body;
 
-		if (!responseToken) {
-			return res.status(401).json({ error: 'Missing Authorization header' });
-		}
-		const token = responseToken.replace('Bearer ', '');
-
-		const decodedToken = jwt.verify(token, SECRET) as JwtPayload;
-		const user_id = decodedToken.id;
-
-		const user = await User.findOne({ where: { id: user_id } });
+		const user = await User.findOne({ where: { id: userId } });
 		if (!user) {
 			throw new Error('User not found');
 		}
@@ -231,23 +214,15 @@ const updatePassword = async (req: Request, res: Response) => {
 
 const deleteUser = async (req: Request, res: Response) => {
 	try {
-		const responseToken = req.headers.authorization;
+		const { userId } = req.body;
 
-		if (!responseToken) {
-			return res.status(401).json({ error: 'Missing Authorization header' });
-		}
-		const token = responseToken.replace('Bearer ', '');
-
-		const decodedToken = jwt.verify(token, SECRET) as JwtPayload;
-		const user_id = decodedToken.id;
-
-		const existingUser = await User.findOne({ where: { id: user_id } });
+		const existingUser = await User.findOne({ where: { id: userId } });
 
 		if (!existingUser) {
 			return res.status(403).json({ message: 'You do not have permission to delete this user' });
 		}
 
-		await User.destroy({ where: { id: user_id } });
+		await User.destroy({ where: { id: userId } });
 
 		return res.status(200).json({ message: 'User deleted' });
 	} catch (error) {

@@ -4,7 +4,7 @@ exports.Post = void 0;
 const sequelize_1 = require("sequelize");
 const databaseConfig_1 = require("../config/databaseConfig");
 const Post = databaseConfig_1.sequelizeConnection.define('Post', {
-    user_id: {
+    userId: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
     },

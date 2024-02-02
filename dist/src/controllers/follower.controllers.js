@@ -9,12 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getFollowingCount = exports.getFollowersCount = exports.unfollowUser = exports.followUser = void 0;
+exports.userAlreadyFollowedUser = exports.getFollowingCount = exports.getFollowersCount = exports.unfollowUser = exports.followUser = void 0;
 const follower_model_1 = require("../models/follower.model");
 const followUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { follower_user_id, following_user_id } = req.body;
-        yield follower_model_1.Follower.create({ follower_user_id, following_user_id });
+        const { followerUserId, followingUserId } = req.body;
+        yield follower_model_1.Follower.create({ followerUserId, followingUserId });
         res.status(201).json({ message: 'Successfully followed the user' });
     }
     catch (error) {
@@ -25,9 +25,9 @@ const followUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 exports.followUser = followUser;
 const unfollowUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { follower_user_id, following_user_id } = req.body;
+        const { followerUserId, followingUserId } = req.body;
         yield follower_model_1.Follower.destroy({
-            where: { follower_user_id, following_user_id },
+            where: { followerUserId, followingUserId },
         });
         res.json({ message: 'Successfully unfollowed the user' });
     }
@@ -42,7 +42,7 @@ const getFollowersCount = (req, res) => __awaiter(void 0, void 0, void 0, functi
     try {
         const followersCount = yield follower_model_1.Follower.count({
             where: {
-                following_user_id: userId,
+                followingUserId: userId,
             },
         });
         res.json(followersCount);
@@ -58,7 +58,7 @@ const getFollowingCount = (req, res) => __awaiter(void 0, void 0, void 0, functi
     try {
         const followingCount = yield follower_model_1.Follower.count({
             where: {
-                follower_user_id: userId,
+                followerUserId: userId,
             },
         });
         res.json(followingCount);
@@ -69,3 +69,22 @@ const getFollowingCount = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.getFollowingCount = getFollowingCount;
+const userAlreadyFollowedUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { followerId, followingId } = req.params;
+        const existingFollow = yield follower_model_1.Follower.findOne({
+            where: {
+                followerUserId: followerId,
+                followingUserId: followingId,
+            },
+        });
+        const followExists = !!existingFollow;
+        console.log('FOLLLLLLLOOOOWWWWW', followExists);
+        res.status(200).json({ followExists });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+exports.userAlreadyFollowedUser = userAlreadyFollowedUser;
