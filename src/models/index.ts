@@ -19,7 +19,7 @@ User.hasMany(Follower, { foreignKey: 'followingUserId', as: 'following', sourceK
 // relation entre Comment et User
 Comment.belongsTo(User, { foreignKey: 'userId', targetKey: 'id' });
 User.hasMany(Comment, { foreignKey: 'userId', sourceKey: 'id' });
-// relation enre Comment et Post
+// relation enre Post  et User
 Post.belongsTo(User, { foreignKey: 'userId', targetKey: 'id' });
 User.hasMany(Post, { foreignKey: 'userId', sourceKey: 'id' });
 
