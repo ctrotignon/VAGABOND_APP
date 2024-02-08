@@ -7,7 +7,6 @@ export const hashPasswordMiddleware = async (req: Request, res: Response, next: 
 		if (!password) {
 			return res.status(400).json({ message: 'Password is required' });
 		}
-
 		const saltRounds = 10;
 		const hashedPassword = await bcrypt.hash(password, saltRounds);
 		req.body.password = hashedPassword;
